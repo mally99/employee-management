@@ -32,9 +32,19 @@ export const Employees = () => {
     setEmployees(sorted);
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
-  const addEmployee = () => navigate("/create");
 
-  const editEmployee = (id?: number) => id && navigate("/edit/" + id);
+  const onAdd = () => navigate("/create");
+
+  const onEdit = (id?: number) => id && navigate("/edit/" + id);
+
+  const onDelete = (id?: number) => {
+    if (!id) return;
+    const filteredEmployees = employees.filter(
+      (employee) => employee.id !== id
+    );
+    setEmployees(filteredEmployees);
+    localStorage.setItem("employees", JSON.stringify(filteredEmployees));
+  };
 
   return (
     <div className="p-6">
@@ -47,7 +57,7 @@ export const Employees = () => {
           {`${strs.sortLabel} ${sortOrder}`}
         </button>
         <button
-          onClick={addEmployee}
+          onClick={onAdd}
           className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center space-x-2"
         >
           <Plus size={16} />
@@ -73,12 +83,15 @@ export const Employees = () => {
             </div>
             <div className="flex space-x-2">
               <button
-                onClick={() => editEmployee(employee.id)}
+                onClick={() => onEdit(employee.id)}
                 className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
                 <Pencil size={16} />
               </button>
-              <button className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+              <button
+                onClick={() => onDelete(employee.id)}
+                className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              >
                 <Trash size={16} />
               </button>
             </div>

@@ -13,46 +13,54 @@ export const EmployeeForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Employee>({
-    defaultValues: isEditMode
-      ? JSON.parse(localStorage.getItem("employees") || "[]").find(
-          (e: Employee) => e.name === id
-        )
-      : {},
-  });
+    reset, // Allows us to reset form values
+  } = useForm<Employee>();
 
-  const onSubmit = async (data: Employee) => {
-    let updatedEmployees: Employee[] = [...employees];
+  useEffect(() => {
+    const storedEmployees = JSON.parse(
+      localStorage.getItem("employees") || "[]"
+    );
+    setEmployees(storedEmployees);
+
     if (isEditMode) {
-      updatedEmployees = employees.map((e: Employee) =>
-        e.name === id ? data : e
+      const employee = storedEmployees.find(
+        (e: Employee) => e.id?.toString() === id
       );
-    } else {
-      const newEmployee: Employee = { id: findSmallestMissingId(), ...data };
-      updatedEmployees.push(newEmployee);
+      if (employee) {
+        reset(employee); // Update the form with the found employee data
+      }
     }
-    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
-    setEmployees(updatedEmployees);
-    navigate("/");
-  };
+  }, [id, isEditMode, reset]);
+
   const findSmallestMissingId = () => {
     const ids = employees
       .map((item) => item.id)
       .filter((id): id is number => id !== undefined)
       .sort((a, b) => a - b);
-    let expectedId = 1; // Start checking from 1
+    let expectedId = 1;
     for (const id of ids) {
-      if (id !== expectedId) {
-        return expectedId; // Return the missing ID
-      }
+      if (id !== expectedId) return expectedId;
       expectedId++;
     }
     return expectedId;
   };
 
-  useEffect(() => {
-    setEmployees(JSON.parse(localStorage.getItem("employees") || "[]"));
-  }, []);
+  const onSubmit = (data: Employee) => {
+    let updatedEmployees: Employee[];
+
+    if (isEditMode) {
+      updatedEmployees = employees.map((e) =>
+        e.id?.toString() === id ? { ...e, ...data } : e
+      );
+    } else {
+      const newEmployee: Employee = { id: findSmallestMissingId(), ...data };
+      updatedEmployees = [...employees, newEmployee];
+    }
+
+    localStorage.setItem("employees", JSON.stringify(updatedEmployees));
+    setEmployees(updatedEmployees);
+    navigate("/");
+  };
 
   return (
     <div className="p-6 max-w-lg mx-auto">

@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+src/components/Edit.tsx
+src/components/EmployeeForm.tsx
+src/components/Employees.tsx
