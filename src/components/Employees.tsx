@@ -11,6 +11,10 @@ export const Employees = () => {
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredEmployees, setFilteredEmployees] = useState<Array<Employee>>(
+    []
+  );
 
   const strs = strings.employees;
   const navigate = useNavigate();
@@ -19,11 +23,20 @@ export const Employees = () => {
     const storedEmployees = localStorage.getItem("employees");
     if (storedEmployees) {
       setEmployees(JSON.parse(storedEmployees));
+      setFilteredEmployees(JSON.parse(storedEmployees));
     } else {
       localStorage.setItem("employees", JSON.stringify(mockup));
       setEmployees(mockup);
+      setFilteredEmployees(mockup);
     }
   }, []);
+  useEffect(() => {
+    setFilteredEmployees(
+      employees.filter((employee) =>
+        employee.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, employees]);
   // Listen for dark mode changes
   useEffect(() => {
     const handleDarkModeChange = () => {
@@ -72,6 +85,13 @@ export const Employees = () => {
       <h2 className="text-2xl font-bold">{strs.title}</h2>
 
       <div className="flex space-x-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search employees..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="p-2 border rounded-lg"
+        />
         <button
           onClick={sortEmployees}
           className="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
@@ -88,7 +108,7 @@ export const Employees = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {employees?.map((employee, index) => (
+        {filteredEmployees.map((employee, index) => (
           <div
             key={index}
             className={`p-4 border rounded-lg shadow-md flex justify-between items-center ${
