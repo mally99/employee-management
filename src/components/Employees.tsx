@@ -4,6 +4,7 @@ import { Pencil, Plus, Trash, Sun, Moon } from "lucide-react";
 import { strings } from "../assets/strings";
 import { Employee } from "../interfaces";
 import { useNavigate } from "react-router-dom";
+import { EmployeeDetails } from "./EmployeeDetails";
 
 export const Employees = () => {
   const [employees, setEmployees] = useState<Array<Employee>>([]);
@@ -70,12 +71,6 @@ export const Employees = () => {
     localStorage.setItem("employees", JSON.stringify(filteredEmployees));
   };
 
-  const onChangeDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    localStorage.setItem("theme", newDarkMode ? "dark" : "light");
-  };
-
   return (
     <div
       className={`p-6 min-h-screen ${
@@ -87,7 +82,7 @@ export const Employees = () => {
       <div className="flex space-x-4 mb-4">
         <input
           type="text"
-          placeholder="Search employees..."
+          placeholder={strs.searchLabel}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="p-2 border rounded-lg"
@@ -107,44 +102,15 @@ export const Employees = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {filteredEmployees.map((employee, index) => (
-          <div
+          <EmployeeDetails
             key={index}
-            className={`p-4 border rounded-lg shadow-md flex justify-between items-center ${
-              darkMode ? "bg-gray-800 text-white border-gray-700" : "bg-white"
-            }`}
-          >
-            <div>
-              <h3 className="text-lg font-semibold">{employee.name}</h3>
-              <p className={`text-gray-600 ${darkMode ? "text-white" : ""}`}>
-                {employee.role}
-              </p>
-              <p
-                className={`text-gray-600 ${darkMode ? "text-white" : ""}`}
-              >{`${strs.emailLabel} ${employee.email}`}</p>
-              <p
-                className={`text-gray-600 ${darkMode ? "text-white" : ""}`}
-              >{`${strs.addressLabel} ${employee.address}`}</p>
-              <p
-                className={`text-gray-600 ${darkMode ? "text-white" : ""}`}
-              >{`${strs.phoneLabel} ${employee.phone}`}</p>
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => onEdit(employee.id)}
-                className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                <Pencil size={16} />
-              </button>
-              <button
-                onClick={() => onDelete(employee.id)}
-                className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-              >
-                <Trash size={16} />
-              </button>
-            </div>
-          </div>
+            employee={employee}
+            darkMode={darkMode}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </div>
